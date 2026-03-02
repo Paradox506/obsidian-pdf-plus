@@ -73,7 +73,7 @@ export class copyLinkLib extends PDFPlusLibSubmodule {
         let page = +pageEl.dataset.pageNumber;
         // if there is no selected text, read the current page number from the viewer, not from the selection
         if (!selection.toString()) {
-            page = child.pdfViewer.pdfViewer?.currentPageNumber ?? page;
+            page = this.lib.obsidianPdf.getCurrentPageNumber(child) ?? page;
         }
 
         const selectionStr = child.getTextSelectionRangeStr(pageEl);

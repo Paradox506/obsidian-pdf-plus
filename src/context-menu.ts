@@ -619,7 +619,7 @@ export class PDFPlusContextMenu extends PDFPlusMenu {
                 }
 
                 if (annot.data.subtype === 'Link' && isVisible('link')) {
-                    const doc = child.pdfViewer.pdfViewer?.pdfDocument;
+                    const doc = lib.obsidianPdf.getPdfDocument(child);
                     if ('dest' in annot.data && typeof annot.data.dest === 'string' && doc && child.file) {
                         const destId = annot.data.dest;
                         const file = child.file;

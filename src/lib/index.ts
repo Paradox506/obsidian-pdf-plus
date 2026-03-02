@@ -732,7 +732,9 @@ export class PDFPlusLib {
     }
 
     getAnnotation(id: string) {
-        return this.getPage(true)?.annotationLayer?.annotationLayer.getAnnotation(id);
+        const pageView = this.getPage(true);
+        if (!pageView) return null;
+        return this.obsidianPdf.getAnnotation(pageView, id);
     }
 
     getTextContentItems() {
