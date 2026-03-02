@@ -2040,7 +2040,7 @@ export class PDFPlusSettingTab extends PluginSettingTab {
 									setting.setDesc(createFragment((el) => {
 										el.appendText('Requires ');
 										el.appendChild(this.createLinkTo('enablePDFEdit', 'PDF editing'));
-										el.appendText(' to be enabled.');
+										el.appendText(' to be enabled. These actions modify the PDF file itself, which can cause the current PDF view to reload briefly.');
 									}));
 								}
 								else if (section.id === 'link') {
