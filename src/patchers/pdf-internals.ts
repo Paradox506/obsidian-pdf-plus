@@ -790,7 +790,7 @@ const patchPDFViewerChild = (plugin: PDFPlus, child: PDFViewerChild) => {
                 const getAnnotationEl = () => {
                     if (this.annotationHighlight) return this.annotationHighlight;
                     const pageView = this.getPage(page);
-                    return pageView.annotationLayer?.div.querySelector<HTMLElement>(`[data-annotation-id="${id}"]`);
+                    return lib.obsidianPdf.getAnnotationElement(pageView, id);
                 };
 
                 if (plugin.settings.trimSelectionEmbed
