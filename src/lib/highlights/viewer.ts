@@ -112,9 +112,9 @@ export class ViewerHighlightLib extends PDFPlusLibSubmodule {
                 // If `zoomToFitRect === true`, it will be handled by `PDFViewerChild.prototype.applySubpath` as a FitR destination.
                 if (!this.settings.zoomToFitRect) {
                     activeWindow.setTimeout(() => {
-                        window.pdfjsViewer.scrollIntoView(child.rectHighlight, {
-                            top: - this.settings.embedMargin
-                        });
+                        if (child.rectHighlight) {
+                            this.lib.obsidianPdf.scrollIntoView(child.rectHighlight, -this.settings.embedMargin);
+                        }
                     });    
                 }
             }

@@ -279,7 +279,8 @@ export class PDFPlusToolbar extends PDFPlusComponent {
             });
             inputEl.addEventListener('change', () => {
                 const value = inputEl.valueAsNumber / 100;
-                const clamped = Math.min(Math.max(value, window.pdfjsViewer.MIN_SCALE), window.pdfjsViewer.MAX_SCALE);
+                const { min, max } = this.lib.obsidianPdf.getScaleBounds();
+                const clamped = Math.min(Math.max(value, min), max);
                 pdfViewer.currentScale = clamped;
             });
             eventBus.on('scalechanging', ({ scale }) => {

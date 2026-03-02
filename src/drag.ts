@@ -124,7 +124,10 @@ export const registerOutlineDrag = async (plugin: PDFPlus, pdfOutlineViewer: PDF
 export const registerThumbnailDrag = (plugin: PDFPlus, child: PDFViewerChild, file: TFile) => {
     const { app, lib } = plugin;
 
-    child.pdfViewer.pdfThumbnailViewer.container
+    const thumbnailContainer = lib.obsidianPdf.getThumbnailContainer(child);
+    if (!thumbnailContainer) return;
+
+    thumbnailContainer
         .querySelectorAll<HTMLElement>('div.thumbnail[data-page-number]')
         .forEach((div) => {
             const pageNumber = parseInt(div.dataset.pageNumber!);

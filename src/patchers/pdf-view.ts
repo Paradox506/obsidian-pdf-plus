@@ -23,13 +23,14 @@ export const patchPDFView = (plugin: PDFPlus): boolean => {
                     const child = self.viewer.child;
                     const pdfViewer = child?.pdfViewer?.pdfViewer;
                     if (pdfViewer) {
+                        const location = lib.obsidianPdf.getLocation(pdfViewer);
                         // When the PDF viewer's top edge is on the lower half of the previous page,
                         // pdfViewer._location?.pageNumber points to the previous page, but 
                         // currentPageNumber points to the current page.
                         // For our purpose, the former is preferable, so we use it if available.
-                        ret.page = pdfViewer._location?.pageNumber ?? pdfViewer.currentPageNumber;
-                        ret.left = pdfViewer._location?.left;
-                        ret.top = pdfViewer._location?.top;
+                        ret.page = location?.pageNumber ?? pdfViewer.currentPageNumber;
+                        ret.left = location?.left;
+                        ret.top = location?.top;
                         ret.zoom = pdfViewer.currentScale;
                     }
                     return ret;

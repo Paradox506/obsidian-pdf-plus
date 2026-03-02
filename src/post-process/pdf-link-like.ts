@@ -167,7 +167,7 @@ abstract class PDFDestinationHolderPostProcessor extends PDFLinkLikePostProcesso
 
         if (!isMouseEventExternal(evt, targetEl)) return null;
 
-        const doc = child.pdfViewer.pdfViewer?.pdfDocument;
+        const doc = lib.obsidianPdf.getPdfDocument(child);
         if (!doc) return null;
 
         const dest = this.getDest();
@@ -215,7 +215,7 @@ export class PDFInternalLinkPostProcessor extends PDFDestinationHolderPostProces
             && this.lib.requirePluginNewerThan('surfing', '0.9.5')) {
             const destId = this.getDest();
             if (this.lib.isCitationId(destId)) {
-                const doc = this.child.pdfViewer.pdfViewer?.pdfDocument;
+                const doc = this.lib.obsidianPdf.getPdfDocument(this.child);
                 if (doc) {
                     const url = this.child.bib?.getGoogleScholarSearchUrlFromDest(destId);
                     if (url) return url;
@@ -316,7 +316,9 @@ export class PDFThumbnailItemPostProcessor extends PDFLinkLikePostProcessor {
     static readonly HOVER_LINK_SOURCE_ID = 'pdf-plus-thumbnail';
 
     static registerEvents(plugin: PDFPlus, child: PDFViewerChild) {
-        return new PDFThumbnailItemPostProcessor(plugin, child, child.pdfViewer.pdfThumbnailViewer.container);
+        const container = plugin.lib.obsidianPdf.getThumbnailContainer(child);
+        if (!container) return null;
+        return new PDFThumbnailItemPostProcessor(plugin, child, container);
     }
 
     async getLinkText(evt: MouseEvent) {

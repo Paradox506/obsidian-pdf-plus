@@ -15,6 +15,7 @@ import { PDFOutlines } from './outlines';
 import { NameTree, NumberTree } from './name-or-number-trees';
 import { PDFNamedDestinations } from './destinations';
 import { PDFPageLabels } from './page-labels';
+import { ObsidianPdfAdapter } from 'adapters/obsidian-pdf-adapter';
 import { AnnotationElement, CanvasFileNode, CanvasNode, CanvasView, DestArray, EventBus, ObsidianViewer, PDFPageView, PDFView, PDFViewExtraState, PDFViewerChild, PDFJsDestArray, PDFViewer, PDFEmbed, PDFViewState, Rect, TextContentItem, PDFFindBar, PDFSearchSettings, PDFJsEventMap, BacklinkView, ExcalidrawView } from 'typings';
 import { PDFCroppedEmbed } from '../pdf-cropped-embed';
 import { PDFBacklinkIndex } from './pdf-backlink-index';
@@ -51,6 +52,7 @@ export class PDFPlusLib {
     composer: PDFComposer;
     dummyFileManager: DummyFileManager;
     speech: Speech;
+    obsidianPdf: ObsidianPdfAdapter;
 
     utils = utils;
 
@@ -74,6 +76,7 @@ export class PDFPlusLib {
         this.composer = new PDFComposer(plugin);
         this.dummyFileManager = new DummyFileManager(plugin);
         this.speech = new Speech(plugin);
+        this.obsidianPdf = new ObsidianPdfAdapter();
     }
 
     /** 
@@ -96,7 +99,7 @@ export class PDFPlusLib {
      * @param component A component such that the callback is unregistered when the component is unloaded, or `null` if the callback should be called only once.
      */
     onPageReady(viewer: ObsidianViewer, component: Component | null, cb: (pageNumber: number, pageView: PDFPageView, newlyRendered: boolean) => any) {
-        viewer.pdfViewer?._pages
+        this.obsidianPdf.getPageViews(viewer)
             .forEach((pageView, pageIndex) => {
                 cb(pageIndex + 1, pageView, false); // page number is 1-based
             });
@@ -111,7 +114,7 @@ export class PDFPlusLib {
      * @param component A component such that the callback is unregistered when the component is unloaded, or `null` if the callback should be called only once.
      */
     onTextLayerReady(viewer: ObsidianViewer, component: Component | null, cb: (pageNumber: number, pageView: PDFPageView, newlyRendered: boolean) => any) {
-        viewer.pdfViewer?._pages
+        this.obsidianPdf.getPageViews(viewer)
             .forEach((pageView, pageIndex) => {
                 if (pageView.textLayer) {
                     cb(pageIndex + 1, pageView, false); // page number is 1-based
@@ -128,7 +131,7 @@ export class PDFPlusLib {
      * @param component A component such that the callback is unregistered when the component is unloaded, or `null` if the callback should be called only once.
      */
     onAnnotationLayerReady(viewer: ObsidianViewer, component: Component | null, cb: (pageNumber: number, pageView: PDFPageView, newlyRendered: boolean) => any) {
-        viewer.pdfViewer?._pages
+        this.obsidianPdf.getPageViews(viewer)
             .forEach((pageView, pageIndex) => {
                 if (pageView.annotationLayer) {
                     cb(pageIndex + 1, pageView, false); // page number is 1-based
@@ -729,7 +732,9 @@ export class PDFPlusLib {
     }
 
     getAnnotation(id: string) {
-        return this.getPage(true)?.annotationLayer?.annotationLayer.getAnnotation(id);
+        const pageView = this.getPage(true);
+        if (!pageView) return null;
+        return this.obsidianPdf.getAnnotation(pageView, id);
     }
 
     getTextContentItems() {

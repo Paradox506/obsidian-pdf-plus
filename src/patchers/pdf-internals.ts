@@ -389,13 +389,12 @@ const patchPDFViewerChild = (plugin: PDFPlus, child: PDFViewerChild) => {
                 lib.registerPDFEvent('annotationlayerrendered', this.pdfViewer.eventBus, this.component!, (data) => {
                     const { source: pageView } = data;
 
-                    pageView.annotationLayer?.div
-                        ?.querySelectorAll<HTMLElement>('section[data-annotation-id]')
+                    lib.obsidianPdf.getAnnotationElements(pageView)
                         .forEach((el) => {
                             const annotationId = el.dataset.annotationId;
                             if (!annotationId) return;
 
-                            const annot = pageView.annotationLayer?.annotationLayer.getAnnotation(annotationId);
+                            const annot = lib.obsidianPdf.getAnnotation(pageView, annotationId);
                             if (!annot) return;
 
                             // Needed to avoid registering the event listeners on the same annotation container element multiple times
@@ -639,7 +638,7 @@ const patchPDFViewerChild = (plugin: PDFPlus, child: PDFViewerChild) => {
                                 // As per the PDF spec, a null value for left/top/zoom means "leave unchanged"
                                 // however, PDF.js doesn't seem to handle this correctly, so we need to pass in the current values explicitly.
                                 const pdfViewer = this.pdfViewer?.pdfViewer;
-                                const currentLocation = pdfViewer?._location;
+                                const currentLocation = lib.obsidianPdf.getLocation(pdfViewer ?? null);
                                 if (plugin.settings.preserveCurrentLeftOffsetWhenOpenPDFLink) {
                                     dest = [page - 1, { name: 'XYZ' }, currentLocation?.left ?? null, null, null];
                                 } else {
@@ -777,9 +776,7 @@ const patchPDFViewerChild = (plugin: PDFPlus, child: PDFViewerChild) => {
                 }
 
                 if (textDivFirst) {
-                    window.pdfjsViewer.scrollIntoView(textDivFirst, {
-                        top: - plugin.settings.embedMargin
-                    }, true);
+                    lib.obsidianPdf.scrollIntoView(textDivFirst, -plugin.settings.embedMargin, true);
                 }
 
                 plugin.trigger('highlight', { type: 'selection', source: 'obsidian', pageNumber: page, child: this });
@@ -790,7 +787,7 @@ const patchPDFViewerChild = (plugin: PDFPlus, child: PDFViewerChild) => {
                 const getAnnotationEl = () => {
                     if (this.annotationHighlight) return this.annotationHighlight;
                     const pageView = this.getPage(page);
-                    return pageView.annotationLayer?.div.querySelector<HTMLElement>(`[data-annotation-id="${id}"]`);
+                    return lib.obsidianPdf.getAnnotationElement(pageView, id);
                 };
 
                 if (plugin.settings.trimSelectionEmbed
@@ -818,9 +815,7 @@ const patchPDFViewerChild = (plugin: PDFPlus, child: PDFViewerChild) => {
 
                 if (el) {
                     activeWindow.setTimeout(() => {
-                        window.pdfjsViewer.scrollIntoView(el, {
-                            top: - plugin.settings.embedMargin
-                        }, true);
+                        lib.obsidianPdf.scrollIntoView(el, -plugin.settings.embedMargin, true);
                     });
                 }
 

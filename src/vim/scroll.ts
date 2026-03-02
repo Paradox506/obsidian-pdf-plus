@@ -21,7 +21,7 @@ export class ScrollController {
     getPageDiv(offset = 0) {
         const pdfViewer = this.vim.pdfViewer;
         if (pdfViewer) {
-            return pdfViewer._pages[pdfViewer.currentPageNumber - 1 + offset]?.div;
+            return this.vim.lib.obsidianPdf.getPageDivWithOffset(pdfViewer, offset);
         }
     }
 
